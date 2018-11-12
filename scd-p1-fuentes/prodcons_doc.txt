@@ -1,0 +1,18 @@
+PROBLEMA PRODUCTOR-CONSUMIDOR: DOCUMENTACION
+
+#Solución adoptada: FIFO
+    #Variables necesarias: 
+        ~primera_libre: contador que gestiona las celdas del vector (buffer intermedio) donde podemos escribir.
+            Recorre el vector desde la primera posición y escribe en cada posición hasta llegar al final donde se pone
+            nuevamente a 0.
+        ~primera_ocupada: contador que gestiona las celdas del vector ocupadas de las que podemos leer.
+            Recorre y lee del vector una vez que haya al menos una celda ocupada y se pone a cero cada vez que llega a tam_vec - 1.
+
+    #Semáforos:
+        ~libres: gestiona las celdas libres que hay en cada momento del vector.
+            Valor inicial: tam_vec
+            Se realiza un sem_wait cada vez que se produce un dato y un sem_signal cada vez que se consume.
+        
+        ~ocupadas: gestiona las celdas ocupadas que hay en cada momento del vector.
+            Valor inicial: 0
+            Se realiza un sem_signal cada vez que se produce un dato y un sem_wait cada vez que se consume.

@@ -1,0 +1,11 @@
+Monitor Barberia
+
+var 
+    {Indica si el barbero está ocupado cortando el pelo a algún cliente}
+    silla_barbero : codition 
+
+    {Cola de espera para los clientes hasta silla_barbero.empty()}
+    sala_espera : condition
+
+    {Cola para dormir al barbero si no hay ningún cliente para cortar el pelo}
+    barbero : condition

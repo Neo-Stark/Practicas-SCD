@@ -1,0 +1,12 @@
+PROBLEMA DE LOS FUMADORES: DOCUMENTACION
+
+SEMAFOROS:
+-mostr_vacio : gestiona la ocupación del mostrador, solo puede haber un ingrediente a la vez.
+    #valor inicial: 1
+    #Hebras que hacen sem_signal: hebra_fumadores[num_fumadores]
+    #Hebra que hacen sem_wait: hebra_estanquero
+
+-ingr_disp[num_fumadores] : gestiona que ingrediente está disponible en cada momento.
+    #valor inicial: 0
+    #Hebra que hacen sem_signal: hebra_estanquero
+    #Hebras que hacen sem_wait: hebra_fumadores[num_fumadores]

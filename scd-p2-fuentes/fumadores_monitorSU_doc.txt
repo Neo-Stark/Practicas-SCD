@@ -1,0 +1,15 @@
+Monitor Estanco
+
+var
+    {Indica si el mostrador tiene algún ingrediente}
+    mostrador_libre : bool := true ;
+
+    {Indica el ingrediente depositado en el mostrador 
+        Valores posibles para 3 fumadores: 0, 1, 2}
+    ingrediente : integer := -1;
+
+
+    mostrador : Condition ; {cola de espera para el estanquero hasta mostrador_libre == true}
+    ingrediente1 : Condition ; {cola de espera hasta ingrediente == 1}
+    ingrediente2 : Condition ; {cola de espera hasta ingrediente == 2}
+    ingrediente3 : Condition ; {cola de espera hasta ingrediente == 3}
