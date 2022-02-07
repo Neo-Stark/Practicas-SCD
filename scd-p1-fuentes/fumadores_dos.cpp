@@ -9,10 +9,15 @@
 using namespace std;
 using namespace SEM;
 
-const unsigned num_fumadores = 3;
+const unsigned num_fumadores = 4;
 Semaphore mostr_vacio = 1;
-Semaphore ingr_disp[num_fumadores] = {0, 0, 0};
+Semaphore ingr_disp[num_fumadores] = {0, 0, 0, 0};
 
+const int num_ceniceros = 2;
+
+int ceniceros[num_ceniceros] ;
+Semaphore limpiadora[num_ceniceros] = {1, 1};
+Semaphore avisos[num_ceniceros] = {1, 1};
 //**********************************************************************
 // plantilla de función para generar un entero aleatorio uniformemente
 // distribuido entre dos valores enteros, ambos incluidos
@@ -25,6 +30,34 @@ int aleatorio()
     static default_random_engine generador((random_device())());
     static uniform_int_distribution<int> distribucion_uniforme(min, max);
     return distribucion_uniforme(generador);
+}
+
+//actualizar cenicero
+
+void actualizar_cenicero(int num_cenicero)
+{
+
+    sem_wait(avisos[num_cenicero]);
+    ceniceros[num_cenicero] += 1;
+    sem_signal(avisos[num_cenicero]);
+
+    if (ceniceros[num_cenicero] == 7)
+    {
+        sem_signal(limpiadora[num_cenicero]);
+        cout << "Cenicero sucio " << num_cenicero << endl;
+        sem_wait(avisos[num_cenicero]);
+    }
+}
+
+void funcion_hebra_limpiadora(int num_cenicero)
+{
+    while (true)
+    {
+        sem_wait(limpiadora[num_cenicero]);
+        cout << "Limpiando cenicero número " << num_cenicero << endl;
+        ceniceros[num_cenicero] = 0;
+        sem_signal(avisos[num_cenicero]);
+    }
 }
 
 //-------------------------------------------------------------------------
@@ -76,9 +109,11 @@ void funcion_hebra_fumador(int num_fumador)
     while (true)
     {
         sem_wait(ingr_disp[num_fumador]);
-        cout << "Retirado ingrediente: " << num_fumador << endl;
+        cout << "Retirando ingrediente " << num_fumador << " del mostrador" << endl;
         sem_signal(mostr_vacio);
         fumar(num_fumador);
+        actualizar_cenicero(num_fumador % num_ceniceros); // <-------------------
+        cout << "Fumador " << num_fumador << " tiene limpio el cenicero" << endl;
     }
 }
 
@@ -100,8 +135,6 @@ void funcion_hebra_estanquero()
 
 int main()
 {
-    int numero(25);
-    cout << setw(10) << setfill('*') << numero;
     cout << "--------------------------------------------------------" << endl
          << "Problema de los fumadores." << endl
          << "--------------------------------------------------------" << endl
@@ -110,9 +143,15 @@ int main()
     for (int i = 0; i < num_fumadores; i++)
         hebra_fumadores[i] = thread(funcion_hebra_fumador, i);
 
+    thread hebra_limpiadora[num_ceniceros];
+    for (int i = 0; i < num_ceniceros; i++)
+        hebra_limpiadora[i] = thread(funcion_hebra_limpiadora, i);
+
     thread hebra_estanquero(funcion_hebra_estanquero);
 
     for (int i = 0; i < num_fumadores; i++)
         hebra_fumadores[i].join();
+    for (int i = 0; i < num_ceniceros; i++)
+        hebra_limpiadora[i].join();
     hebra_estanquero.join();
 }
